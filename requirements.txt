@@ -1,0 +1,5 @@
+fastapi
+nltk
+onnxruntime
+TTS
+sacremoses
