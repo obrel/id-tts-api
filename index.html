@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ID TTS - Ubah teks menjadi suara</title>
+  <meta name="description" content="Ubah teks menjadi suara" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+</head>
+
+<body>
+  <div class="min-vh-100 bg-light py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+              <h1 class="card-title h3 mb-0">ID TTS</h1>
+              <p class="mb-0 mt-2 opacity-75">Ubah teks menjadi suara</p>
+            </div>
+            <div class="card-body p-4">
+              <div id="inputSection">
+                <form id="textForm">
+                  <div class="mb-3">
+                    <label for="textInput" class="form-label fw-semibold">
+                      Masukkan teks:
+                    </label>
+                    <textarea id="textInput" class="form-control" rows="6" placeholder="Type or paste your text here..."></textarea>
+                  </div>
+                  <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
+                  <div class="mb-3">
+                    <label for="audioType" class="form-label fw-semibold">
+                      Pilihan Suara:
+                    </label>
+                    <select id="audioType" class="form-select">
+                      <option value="wibowo">Wibowo</option>
+                    </select>
+                  </div>
+                  <div class="d-grid">
+                    <button type="submit" id="submitBtn" class="btn btn-primary btn-lg">
+                      Ubah
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div id="audioSection" class="text-center d-none">
+                <div class="mb-4">
+                  <div class="alert alert-success" role="alert">
+                    Berhasil mengubah teks menjadi suara.
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <audio id="audioPlayer" controls  class="w-100" style="max-width: 400px;">
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>                
+                <button id="resetBtn" class="btn btn-outline-primary">
+                  Kembali
+                </button>
+              </div>
+            </div>
+            <div class="card-footer text-center text-muted">
+              <small>Dibuat di Bogor dengan &#9829;.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // DOM elements
+    const textForm = document.getElementById('textForm');
+    const textInput = document.getElementById('textInput');
+    const audioType = document.getElementById('audioType');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorAlert = document.getElementById('errorAlert');
+    const inputSection = document.getElementById('inputSection');
+    const audioSection = document.getElementById('audioSection');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Form submission handler
+    textForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const text = textInput.value.trim();
+      const selectedAudioType = audioType.value;
+      
+      if (!text) {
+        showError('Masukkan teks yang ingin diubah.');
+        return;
+      }
+
+      setLoading(true);
+      hideError();
+
+      try {
+        const response = await fetch('/api/speech', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            text: text,
+            audioType: selectedAudioType
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Assuming the API returns an audio URL or we need to create a blob URL
+          let audioUrl;
+          if (data.audioUrl) {
+            audioUrl = data.audioUrl;
+          } else {
+            // If response contains audio data as blob
+            const blob = await response.blob();
+            audioUrl = URL.createObjectURL(blob);
+          }
+          
+          showAudioPlayer(audioUrl);
+        } else {
+          throw new Error('Gagal mengubah teks menjadi suara.');
+        }
+      } catch (error) {
+        showError('Gagal mengubah teks menjadi suara. Silakan ulangi.');
+        console.error('API Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Reset button handler
+    resetBtn.addEventListener('click', function() {
+      resetForm();
+    });
+
+    // Helper functions
+    function setLoading(loading) {
+      if (loading) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Silakan tunggu...';
+        textInput.disabled = true;
+        audioType.disabled = true;
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Ubah teks ke suara';
+        textInput.disabled = false;
+        audioType.disabled = false;
+      }
+    }
+
+    function showError(message) {
+      errorAlert.textContent = message;
+      errorAlert.classList.remove('d-none');
+    }
+
+    function hideError() {
+      errorAlert.classList.add('d-none');
+    }
+
+    function showAudioPlayer(audioUrl) {
+      audioPlayer.src = audioUrl;
+      inputSection.classList.add('d-none');
+      audioSection.classList.remove('d-none');
+    }
+
+    function resetForm() {
+      textInput.value = '';
+      audioType.value = 'mp3';
+      textInput.disabled = false;
+      audioType.disabled = false;
+      submitBtn.disabled = false;
+      audioSection.classList.add('d-none');
+      inputSection.classList.remove('d-none');
+      hideError();
+      
+      // Clean up audio URL if it was created from blob
+      if (audioPlayer.src && audioPlayer.src.startsWith('blob:')) {
+        URL.revokeObjectURL(audioPlayer.src);
+      }
+      audioPlayer.src = '';
+    }
+
+    // Update button state based on input
+    textInput.addEventListener('input', function() {
+      submitBtn.disabled = !this.value.trim();
+    });
+
+    // Initialize button state
+    submitBtn.disabled = true;
+  </script>
+</body>
+
+</html>

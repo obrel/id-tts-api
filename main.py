@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from src.routers import api
 
@@ -13,7 +14,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"status": "ok"}
+    return FileResponse('./index.html')
 
 app.include_router(
     api.router,
