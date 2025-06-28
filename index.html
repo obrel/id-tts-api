@@ -114,19 +114,15 @@
           let audioUrl;
           if (data.audio_data) {
             audioUrl = URL.createObjectURL(data.audio_data);
+            showAudioPlayer(audioUrl);
           } else {
-            // If response contains audio data as blob
-            const blob = await response.blob();
-            audioUrl = URL.createObjectURL(blob);
+            showError('Gagal mengubah teks menjadi suara. Silakan ulangi.')
           }
-          
-          showAudioPlayer(audioUrl);
         } else {
           throw new Error('Gagal mengubah teks menjadi suara.');
         }
       } catch (error) {
-        showError('Gagal mengubah teks menjadi suara. Silakan ulangi.');
-        console.error('API Error:', error);
+        showError('Gagal mengubah teks menjadi suara. Error: ' + error);
       } finally {
         setLoading(false);
       }
