@@ -26,7 +26,7 @@
                     <label for="textInput" class="form-label fw-semibold">
                       Masukkan teks:
                     </label>
-                    <textarea id="textInput" class="form-control" rows="6" placeholder="Type or paste your text here..."></textarea>
+                    <textarea id="textInput" class="form-control" rows="6" placeholder="Masukkan teks yang ingin diubah. Maksimal 200 karakter." maxlength="200" required></textarea>
                   </div>
                   <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
                   <div class="mb-3">
@@ -113,16 +113,16 @@
           // Assuming the API returns an audio URL or we need to create a blob URL
           let audioUrl;
           if (data.audio_data) {
-            audioUrl = URL.createObjectURL(data.audio_data);
+            audioUrl = data.audio_data;
             showAudioPlayer(audioUrl);
           } else {
             showError('Gagal mengubah teks menjadi suara. Silakan ulangi.')
           }
         } else {
-          throw new Error('Gagal mengubah teks menjadi suara.');
+          throw new Error('Terjadi kesalahan.');
         }
       } catch (error) {
-        showError('Gagal mengubah teks menjadi suara. Error: ' + error);
+        showError('Gagal mengubah teks menjadi suara: ' + error);
       } finally {
         setLoading(false);
       }
@@ -165,7 +165,7 @@
 
     function resetForm() {
       textInput.value = '';
-      audioType.value = 'mp3';
+      audioType.value = 'wibowo';
       textInput.disabled = false;
       audioType.disabled = false;
       submitBtn.disabled = false;
