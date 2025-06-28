@@ -112,8 +112,8 @@
           const data = await response.json();
           // Assuming the API returns an audio URL or we need to create a blob URL
           let audioUrl;
-          if (data.audio_content) {
-            audioUrl = URL.createObjectURL(data.audio_content);
+          if (data.audio_data) {
+            audioUrl = URL.createObjectURL(data.audio_data);
           } else {
             // If response contains audio data as blob
             const blob = await response.blob();
