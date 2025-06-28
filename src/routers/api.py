@@ -11,18 +11,18 @@ async def generate_speech(request: Request):
 
     if "text" in data:
         if len(data["text"]) < 10:
-            return HTTPException(
+            raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Text must be more than 10 characters."
             )
 
         if len(data["text"]) > 200:
-            return HTTPException(
+            raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Text must be less than 200 characters."
             )
     else:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Missing text field."
         )
@@ -40,17 +40,17 @@ async def generate_speech(request: Request):
 
             return JSONResponse(content={"audio_data": data_uri})
         except FileNotFoundError:
-            return HTTPException(
+            raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Not found."
             )
         except Exception as e:
-            return HTTPException(
+            raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Internal server error."
             )
     else:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error."
         )
