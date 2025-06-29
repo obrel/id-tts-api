@@ -35,6 +35,10 @@
                     </label>
                     <select id="audioType" class="form-select">
                       <option value="wibowo">Wibowo</option>
+                      <option value="ardi">Ardi</option>
+                      <option value="gadis">Gadis</option>
+                      <option value="JV-00264">Sri</option>
+                      <option value="SU-00060">Udin</option>
                     </select>
                   </div>
                   <div class="d-grid">
@@ -54,7 +58,7 @@
                   <audio id="audioPlayer" controls  class="w-100" style="max-width: 400px;">
                     Your browser does not support the audio element.
                   </audio>
-                </div>                
+                </div>
                 <button id="resetBtn" class="btn btn-outline-primary">
                   Kembali
                 </button>
@@ -84,10 +88,10 @@
     // Form submission handler
     textForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      
+
       const text = textInput.value.trim();
       const selectedAudioType = audioType.value;
-      
+
       if (!text) {
         showError('Masukkan teks yang ingin diubah.');
         return;
@@ -102,7 +106,7 @@
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             text: text,
             audioType: selectedAudioType
           }),
@@ -172,7 +176,7 @@
       audioSection.classList.add('d-none');
       inputSection.classList.remove('d-none');
       hideError();
-      
+
       // Clean up audio URL if it was created from blob
       if (audioPlayer.src && audioPlayer.src.startsWith('blob:')) {
         URL.revokeObjectURL(audioPlayer.src);

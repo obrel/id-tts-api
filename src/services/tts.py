@@ -4,7 +4,7 @@ import html
 
 class TTSService:
     @staticmethod
-    def get_response(text: str):
+    def get_response(text: str, audio: str):
         g2p = G2P()
 
         text = html.unescape(text)
@@ -15,11 +15,11 @@ class TTSService:
             "--text", text_to_tts,
             "--model_path", "./checkpoint_1260000-inference.pth",
             "--config_path", "./config.json",
-            "--speaker_idx", "wibowo",
+            "--speaker_idx", audio,
             "--out_path", "./output.wav"
         ]
         result = subprocess.run(command, capture_output=True, text=True)
-    
+
         if result.returncode != 0:
             return ""
         else:

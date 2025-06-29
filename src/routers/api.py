@@ -27,7 +27,18 @@ async def generate_speech(request: Request):
             detail="Missing text field."
         )
 
-    response = TTSService.get_response(data["text"])
+    if "audio_type" in data:
+        audio_type = data["audio_type"]
+
+        if audio_type not in ["wibowo", "ardi", "gadis", "JV-00264", "SU-00060"]:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Invalid audio type."
+            )
+    else:
+        audio_type = "wibowo"
+
+    response = TTSService.get_response(data["text"], audio_type)
 
     if response != "":
         try:
@@ -35,7 +46,7 @@ async def generate_speech(request: Request):
                 audio_bytes = audio_file.read()
 
             encoded_audio = base64.b64encode(audio_bytes).decode("utf-8")
-            audio_format = "wav" 
+            audio_format = "wav"
             data_uri = f"data:audio/{audio_format};base64,{encoded_audio}"
 
             return JSONResponse(content={"audio_data": data_uri})
