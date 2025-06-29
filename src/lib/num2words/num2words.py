@@ -1,7 +1,7 @@
 import re
 from num2words import num2words
 
-def convert_numbers_to_words(input_string):
+def convert(input_string):
     numbers = re.findall(r'\d+', input_string)
 
     for number in numbers:
